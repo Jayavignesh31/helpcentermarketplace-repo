@@ -13,7 +13,15 @@ response = invokeurl
 processJsonUptoTask= response.get('sectionTasks').get('tasks');
 finalizedJson = Map();
 groupingSubJson = Collection();
-for each index item in processJsonUptoTask
+if(response.get('sectionTasks').isEmpty())
+{
+	finalizedJson.put('subject',"Still,we aren't planned any builds.will plann soon");
+	finalizedJson.put('releasenotes', null);
+	finalizedJson.put('tags', collection());
+}
+else 
+{
+	for each index item in processJsonUptoTask
 {
 	finalizedSubJson= Map();
 	/////subject key-value putting
@@ -46,5 +54,6 @@ for each index item in processJsonUptoTask
 	////////Adding each task to finalizedJson
 	groupingSubJson.insert(finalizedSubJson);
 }
-finalizedJson.put("data",groupingSubJson);
+finalizedJson.put("data",groupingSubJson);	
+}
 info finalizedJson;
