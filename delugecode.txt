@@ -1,0 +1,55 @@
+//day = {'sunday','monday','tuesday','wednesday','thursday','friday','saturday'};
+orderNo=['Not yet planned the order','first','second','third','fourth','fifth','sixth','seventh','eight'];
+sectionIdOnDays = {0,105000216401074,105000216401078,105000216401080,105000216380992,105000282286212,0};
+currentDate = '27-Aug-2020'.getDayOfWeek() - 1;
+//replace today
+response = invokeurl
+[
+	url :"https://connect.zoho.com/pulse/nativeapi/sectionTasks"
+	type :GET
+	parameters:{"scopeID":105000017039001,"boardId":105000216380978,"sectionId":sectionIdOnDays.get(currentDate)}
+	connection:"jaiconnecttest"
+];
+processJson = response.get('sectionTasks').get('tasks');
+finalizedJson = Map();
+groupingSubJson = Collection();
+for each index item in processJson
+{
+	//creating subjson
+	finalizedSubJson = Map();
+	finalizedSubTagCollection = Collection();
+	finalizedSubJson.put('subject',processJson.get(item).get('title').get(0).get('text'));
+	finalizedSubJson.put('releasenotes',processJson.get(item).get('desc').get(0).get('linkUrl'));
+	subLoop = processJson.get(item).get('tags');
+	for each index tags in subLoop
+	{
+		finalizedSubTagCollection.insert(subLoop.get(tags).get('name'));
+	}
+	finalizedSubJson.put('tags',finalizedSubTagCollection);
+	//inserting subjson into collection
+	groupingSubJson.insert(finalizedSubJson);
+}
+//Feeding JSON for CLIQ
+finalizedJson.put("data",groupingSubJson);
+//info finalizedJson.get('data').get(0).get('subject');
+//---------------------------
+cliqMsgJson={
+"text": "Hai team Good mrg,Here's the list for today release builds.",
+"bot": {
+    "name": "DESK-QA",
+    "image": "https://e7.pngegg.com/pngimages/637/297/png-clipart-rocket-logo-rocket-blue-logo.png"
+},
+"card": {
+    "theme": "modern-inline"
+	},
+	"slides":[]};
+//Processing cliq JSON
+processFeeder=finalizedJson.get('data');
+for each index cliqdata in processFeeder
+{
+	//info processFeeder.get(cliqdata).get('subject')+"\n[Tags:"+processFeeder.get(cliqdata).get('tags')+"]";
+	//info processFeeder.get(cliqdata).get('releasenotes');
+}
+	
+// x = zoho.cliq.postToChat("CT_2243209938789583353_64396901",cliqMsgJson,"jaiconnecttest");
+// info x;

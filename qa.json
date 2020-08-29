@@ -1,0 +1,41 @@
+{
+    "text": "Hai team Good mrg,Here's the list for today release builds.",
+    "bot": {
+        "name": "DESK-QA",
+        "image": "https://e7.pngegg.com/pngimages/637/297/png-clipart-rocket-logo-rocket-blue-logo.png"
+    },
+    "card": {
+        "theme": "modern-inline"
+    },
+    "slides": [
+        {
+            "type": "text",
+            "title": "First-Build:",
+            "buttons": [
+                {
+                    "label": "Release notes",
+                    "hint": "",
+                    "type": "+",
+                    "action": {
+                        "type": "open.url",
+                        "data": {
+                            "web": "https://crmplus.zoho.com/zohocorppace/index.do/cxapp/projects/adventnet#wiki/11000000272439/Revoke-Blueprint-Fix.html"
+                        }
+                    }
+                },
+                {
+                    "label": "Ticket URL",
+                    "hint": "",
+                    "type": "-",
+                    "action": {
+                        "type": "open.url",
+                        "data": {
+                            "web": "https://desk.zoho.com/support/zohodeskteam/ShowHomePage.do#Cases/dv/119027000103697161"
+                        }
+                    }
+                }
+            ],
+            "data": "#401583Revoke Blueprint Fix\n[tags-meta,predata,postdata]"
+        }
+    ]
+}
