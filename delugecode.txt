@@ -1,7 +1,7 @@
 //day = {'sunday','monday','tuesday','wednesday','thursday','friday','saturday'};
-orderNo=['Not yet planned the order','first','second','third','fourth','fifth','sixth','seventh','eight'];
+orderNo = {'Not yet planned the order','first','second','third','fourth','fifth','sixth','seventh','eight'};
 sectionIdOnDays = {0,105000216401074,105000216401078,105000216401080,105000216380992,105000282286212,0};
-currentDate = '27-Aug-2020'.getDayOfWeek()-2;
+currentDate = '27-Aug-2020'.getDayOfWeek() - 1;
 //replace today
 response = invokeurl
 [
@@ -10,50 +10,74 @@ response = invokeurl
 	parameters:{"scopeID":105000017039001,"boardId":105000216380978,"sectionId":sectionIdOnDays.get(currentDate)}
 	connection:"jaiconnecttest"
 ];
-processJsonUptoTask= response.get('sectionTasks').get('tasks');
+processJsonUptoTask = response.get('sectionTasks').get('tasks');
 finalizedJson = Map();
 groupingSubJson = Collection();
 if(response.get('sectionTasks').isEmpty())
 {
 	finalizedJson.put('subject',"Still,we aren't planned any builds.will plann soon");
-	finalizedJson.put('releasenotes', null);
-	finalizedJson.put('tags', collection());
+	finalizedJson.put('releasenotes',null);
+	finalizedJson.put('tags',Collection());
 }
-else 
+else
 {
 	for each index item in processJsonUptoTask
-{
-	finalizedSubJson= Map();
-	/////subject key-value putting
-	finalizedSubJson.put('subject',processJsonUptoTask.get(item).get('title').get(0).get('text'));
-	
-	/////releasenotes key-value putting
-	if(processJsonUptoTask.get(item).containKey('desc'))
 	{
-		finalizedSubJson.put('releasenotes',processJsonUptoTask.get(item).get('desc').get(0).get('linkUrl'));
-	}
-	else
-	{
-		finalizedSubJson.put('releasenotes',null);
-	}	
-	/////tags key-value putting
-	if(processJsonUptoTask.get(item).containKey('tags'))
-	{
-		finalizedSubTagColection=Collection();
-		subLoop = processJsonUptoTask.get(item).get('tags');
-		for each index tagindex in subLoop
+		finalizedSubJson = Map();
+		/////subject key-value putting
+		finalizedSubJson.put('subject',processJsonUptoTask.get(item).get('title').get(0).get('text'));
+		///ticket-url construction
+		if((finalizedSubJson.get('subject')).matches("[#]{1}[a-zA-Z0-9\s]*"))
 		{
-			finalizedSubTagColection.insert(subLoop.get(tagindex).get('name'));
+			ticketId=((finalizedSubJson.get('subject')).getPrefix(' ')).remove('#');
+			ticketsearch = invokeurl
+            [
+            	url: "https://desk.zoho.com/api/v1/tickets/search"
+            	type: GET
+            	parameters: {"ticketNumber":ticketId}
+				connection:"jaiconnecttest"
+            ];
+			if(ticketsearch.isEmpty())
+			{
+				finalizedSubJson.put('ticketUrl', null);
+			}
+			else 
+            {
+				finalizedSubJson.put('ticketUrl', ticketsearch.get('data').get(0).get('webUrl'));
+            }
 		}
-		finalizedSubJson.put('tags',finalizedSubTagColection);
+		else 
+        {
+			finalizedSubJson.put('ticketUrl', null);
+        }
+		///
+		/////releasenotes key-value putting
+		if(processJsonUptoTask.get(item).containKey('desc'))
+		{
+			finalizedSubJson.put('releasenotes',processJsonUptoTask.get(item).get('desc').get(0).get('linkUrl'));
+		}
+		else
+		{
+			finalizedSubJson.put('releasenotes',null);
+		}
+		/////tags key-value putting
+		if(processJsonUptoTask.get(item).containKey('tags'))
+		{
+			finalizedSubTagColection = Collection();
+			subLoop = processJsonUptoTask.get(item).get('tags');
+			for each index tagindex in subLoop
+			{
+				finalizedSubTagColection.insert(subLoop.get(tagindex).get('name'));
+			}
+			finalizedSubJson.put('tags',finalizedSubTagColection);
+		}
+		else
+		{
+			finalizedSubJson.put('tags',Collection());
+		}
+		////////Adding each task to finalizedJson
+		groupingSubJson.insert(finalizedSubJson);
 	}
-	else
-	{
-		finalizedSubJson.put('tags',collection());
-	}
-	////////Adding each task to finalizedJson
-	groupingSubJson.insert(finalizedSubJson);
+	finalizedJson.put("data",groupingSubJson);
 }
-finalizedJson.put("data",groupingSubJson);	
-}
-info finalizedJson;
+//info finalizedJson;
