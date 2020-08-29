@@ -1,7 +1,7 @@
-//day = {'sunday','monday','tuesday','wednesday','thursday','friday','saturday'};
-orderNo = {'Not yet planned the order','first','second','third','fourth','fifth','sixth','seventh','eight'};
+sdays = {'sunday','monday','tuesday','wednesday','thursday','friday','saturday'};
+ranked = {'Unplanned','first','second','third','fourth','fifth'};
 sectionIdOnDays = {0,105000216401074,105000216401078,105000216401080,105000216380992,105000282286212,0};
-currentDate = '27-Aug-2020'.getDayOfWeek() - 1;
+currentDate = '27-Aug-2020'.getDayOfWeek() - 4;
 //replace today
 response = invokeurl
 [
@@ -27,29 +27,29 @@ else
 		/////subject key-value putting
 		finalizedSubJson.put('subject',processJsonUptoTask.get(item).get('title').get(0).get('text'));
 		///ticket-url construction
-		if((finalizedSubJson.get('subject')).matches("[#]{1}[a-zA-Z0-9\s]*"))
+		if(finalizedSubJson.get('subject').matches("[#]{1}[a-zA-Z0-9\s]*"))
 		{
-			ticketId=((finalizedSubJson.get('subject')).getPrefix(' ')).remove('#');
+			ticketId = finalizedSubJson.get('subject').getPrefix(' ').remove('#');
 			ticketsearch = invokeurl
-            [
-            	url: "https://desk.zoho.com/api/v1/tickets/search"
-            	type: GET
-            	parameters: {"ticketNumber":ticketId}
+			[
+				url :"https://desk.zoho.com/api/v1/tickets/search"
+				type :GET
+				parameters:{"ticketNumber":ticketId}
 				connection:"jaiconnecttest"
-            ];
+			];
 			if(ticketsearch.isEmpty())
 			{
-				finalizedSubJson.put('ticketUrl', null);
+				finalizedSubJson.put('ticketUrl',null);
 			}
-			else 
-            {
-				finalizedSubJson.put('ticketUrl', ticketsearch.get('data').get(0).get('webUrl'));
-            }
+			else
+			{
+				finalizedSubJson.put('ticketUrl',ticketsearch.get('data').get(0).get('webUrl'));
+			}
 		}
-		else 
-        {
-			finalizedSubJson.put('ticketUrl', null);
-        }
+		else
+		{
+			finalizedSubJson.put('ticketUrl',null);
+		}
 		///
 		/////releasenotes key-value putting
 		if(processJsonUptoTask.get(item).containKey('desc'))
@@ -75,9 +75,28 @@ else
 		{
 			finalizedSubJson.put('tags',Collection());
 		}
+		//ordernumber finding
+		k5 = finalizedSubJson.get('tags');
+		if(k5.isEmpty())
+		{
+			finalizedSubJson.put('orderNo',0);
+		}
+		else
+		{
+			finalizedSubJson.put('orderNo',0);
+			for each index orderindex in ranked
+			{
+				if((k5.containsValue(sdays.get(currentDate)+'-'+ranked.get(orderindex)+'-build'))||(k5.containsValue(sdays.get(currentDate)+'_'+ranked.get(orderindex)+'_build')) )
+				{
+					finalizedSubJson.put('orderNo',orderindex);
+				}
+			}
+		}
+		//
+		/////
 		////////Adding each task to finalizedJson
 		groupingSubJson.insert(finalizedSubJson);
 	}
 	finalizedJson.put("data",groupingSubJson);
 }
-//info finalizedJson;
+info finalizedJson;
