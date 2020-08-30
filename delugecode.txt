@@ -1,7 +1,7 @@
 sdays = {'sunday','monday','tuesday','wednesday','thursday','friday','saturday'};
 ranked = {'Unplanned','first','second','third','fourth','fifth'};
 sectionIdOnDays = {1,105000216401074,105000216401078,105000216401080,105000216380992,105000282286212,1};
-currentDate = (toString(now,"dd-MM-yyyy","Asia/Calcutta")).getDayOfWeek()+2;
+currentDate = toString(now,"dd-MM-yyyy","Asia/Calcutta").getDayOfWeek() + 4;
 //replace today
 response = invokeurl
 [
@@ -99,4 +99,40 @@ else
 	}
 	finalizedJson.put("data",groupingSubJson);
 }
-info finalizedJson;
+//info finalizedJson;
+////------------>API Part Done<------------------------
+///cliq side handling
+cliqMsgJson = {"text":"Hai team Good mrg,Here's the list for today release builds.","bot":{"name":"DESK-QA","image":"https://e7.pngegg.com/pngimages/637/297/png-clipart-rocket-logo-rocket-blue-logo.png"},"card":{"theme":"modern-inline"},"slides":{}};
+slideJson = {"type":"text","title":"","data":"","buttons":{}};
+buttonJsonR = {"label":"Release notes","type":"+","action":{"type":"open.url","data":{"web":""}}};
+buttonJsonT = {"label":"Ticket URL","type":"+","action":{"type":"open.url","data":{"web":""}}};
+cliqloop = finalizedJson.get('data');
+none = Collection();
+first = Collection();
+second = Collection();
+third = Collection();
+fourth = Collection();
+fifth = Collection();
+for each index cliqslideindex in cliqloop
+{
+	buttonGroup = Collection();
+	slideJson.put('data',cliqloop.get(cliqslideindex).get('subject') + '\n[Tags:' + cliqloop.get(cliqslideindex).get('tags') + ']');
+	slideJson.put('title',ranked.get(cliqloop.get(cliqslideindex).get('orderNo')) + '-build');
+	if(cliqloop.get(cliqslideindex).get('releasenotes') != null)
+	{
+		br = buttonJsonR.get('action').get('data');
+		br.put('web',cliqloop.get(cliqslideindex).get('releasenotes'));
+		buttonGroup.insert(buttonJsonR);
+	}
+	if(cliqloop.get(cliqslideindex).get('ticketUrl') != null)
+	{
+		bt = buttonJsonT.get('action').get('data');
+		bt.put('web',cliqloop.get(cliqslideindex).get('ticketUrl'));
+		buttonGroup.insert(buttonJsonT);
+	}
+	//info buttonGroup;
+	//info slideJson;
+	slideJson.put('buttons',buttonGroup);
+}
+xsam=zoho.cliq.postToChat("CT_2243209938789583353_64396901",slideJson,"jaiconnecttest");
+info xsam;
