@@ -1,7 +1,7 @@
 sdays = {'sunday','monday','tuesday','wednesday','thursday','friday','saturday'};
 ranked = {'Unplanned','first','second','third','fourth','fifth'};
-sectionIdOnDays = {0,105000216401074,105000216401078,105000216401080,105000216380992,105000282286212,0};
-currentDate = '27-Aug-2020'.getDayOfWeek() - 4;
+sectionIdOnDays = {1,105000216401074,105000216401078,105000216401080,105000216380992,105000282286212,1};
+currentDate = (toString(now,"dd-MM-yyyy","Asia/Calcutta")).getDayOfWeek()+2;
 //replace today
 response = invokeurl
 [
@@ -27,7 +27,7 @@ else
 		/////subject key-value putting
 		finalizedSubJson.put('subject',processJsonUptoTask.get(item).get('title').get(0).get('text'));
 		///ticket-url construction
-		if(finalizedSubJson.get('subject').matches("[#]{1}[a-zA-Z0-9\s]*"))
+		if(finalizedSubJson.get('subject').matches("[#]{1}[a-zA-Z0-9\s~`!@#$%^&*()_+{}|:\"<>?\-=\\;\',.\/]*"))
 		{
 			ticketId = finalizedSubJson.get('subject').getPrefix(' ').remove('#');
 			ticketsearch = invokeurl
@@ -86,7 +86,7 @@ else
 			finalizedSubJson.put('orderNo',0);
 			for each index orderindex in ranked
 			{
-				if((k5.containsValue(sdays.get(currentDate)+'-'+ranked.get(orderindex)+'-build'))||(k5.containsValue(sdays.get(currentDate)+'_'+ranked.get(orderindex)+'_build')) )
+				if(k5.containsValue(sdays.get(currentDate) + '-' + ranked.get(orderindex) + '-build') || k5.containsValue(sdays.get(currentDate) + '_' + ranked.get(orderindex) + '_build'))
 				{
 					finalizedSubJson.put('orderNo',orderindex);
 				}
