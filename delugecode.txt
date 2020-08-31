@@ -1,8 +1,8 @@
 sdays = {'sunday','monday','tuesday','wednesday','thursday','friday','saturday'};
 ranked = {'Unplanned','first','second','third','fourth','fifth'};
 sectionIdOnDays = {1,105000216401074,105000216401078,105000216401080,105000216380992,105000282286212,1};
-currentDate = toString(now,"dd-MM-yyyy","Asia/Calcutta").getDayOfWeek() + 4;
-//replace today
+currentDate = toString(now,"dd-MM-yyyy","Asia/Calcutta").getDayOfWeek()+1;
+//minus for correct indexing
 response = invokeurl
 [
 	url :"https://connect.zoho.com/pulse/nativeapi/sectionTasks"
@@ -10,6 +10,8 @@ response = invokeurl
 	parameters:{"scopeID":105000017039001,"boardId":105000216380978,"sectionId":sectionIdOnDays.get(currentDate)}
 	connection:"jaiconnecttest"
 ];
+//"sectionId":sectionIdOnDays.get(currentDate)
+//105000216404252
 processJsonUptoTask = response.get('sectionTasks').get('tasks');
 finalizedJson = Map();
 groupingSubJson = Collection();
@@ -103,18 +105,20 @@ else
 ////------------>API Part Done<------------------------
 ///cliq side handling
 cliqMsgJson = {"text":"Hai team Good mrg,Here's the list for today release builds.","bot":{"name":"DESK-QA","image":"https://e7.pngegg.com/pngimages/637/297/png-clipart-rocket-logo-rocket-blue-logo.png"},"card":{"theme":"modern-inline"},"slides":{}};
-slideJson = {"type":"text","title":"","data":"","buttons":{}};
-buttonJsonR = {"label":"Release notes","type":"+","action":{"type":"open.url","data":{"web":""}}};
-buttonJsonT = {"label":"Ticket URL","type":"+","action":{"type":"open.url","data":{"web":""}}};
+///slides creating section
 cliqloop = finalizedJson.get('data');
-none = Collection();
-first = Collection();
-second = Collection();
-third = Collection();
-fourth = Collection();
-fifth = Collection();
+unplannedc = Collection();
+firstc = Collection();
+secondc = Collection();
+thirdc = Collection();
+fourthc = Collection();
+fifthc = Collection();
 for each index cliqslideindex in cliqloop
 {
+	slideJson = {"type":"text","title":"","data":"","buttons":{}};
+	buttonJsonR = {"label":"Release notes","type":"+","action":{"type":"open.url","data":{"web":""}}};
+	buttonJsonT = {"label":"Ticket URL","type":"+","action":{"type":"open.url","data":{"web":""}}};
+	numberForReorder = cliqloop.get(cliqslideindex).get('orderNo');
 	buttonGroup = Collection();
 	slideJson.put('data',cliqloop.get(cliqslideindex).get('subject') + '\n[Tags:' + cliqloop.get(cliqslideindex).get('tags') + ']');
 	slideJson.put('title',ranked.get(cliqloop.get(cliqslideindex).get('orderNo')) + '-build');
@@ -130,9 +134,149 @@ for each index cliqslideindex in cliqloop
 		bt.put('web',cliqloop.get(cliqslideindex).get('ticketUrl'));
 		buttonGroup.insert(buttonJsonT);
 	}
-	//info buttonGroup;
-	//info slideJson;
 	slideJson.put('buttons',buttonGroup);
+	if(numberForReorder == 1)
+	{
+		firstc.insert(slideJson);
+	}
+	else if(numberForReorder == 2)
+	{
+		secondc.insert(slideJson);
+	}
+	else if(numberForReorder == 3)
+	{
+		thirdc.insert(slideJson);
+	}
+	else if(numberForReorder == 0)
+	{
+		unplannedc.insert(slideJson);
+	}
+	else if(numberForReorder == 4)
+	{
+		fourthc.insert(slideJson);
+	}
+	else if(numberForReorder == 5)
+	{
+		fifthc.insert(slideJson);
+	}
 }
-xsam=zoho.cliq.postToChat("CT_2243209938789583353_64396901",slideJson,"jaiconnecttest");
-info xsam;
+//info secondc+"--pose";
+///-----------------
+///final cliq json assemble section
+if(unplannedc.isEmpty() && firstc.isEmpty())
+{
+	//info "yes";
+	cliqMsgJson.put("text","Hai team Good mrg,Still we aren't planned any builds yet.will plan soon");
+}
+else
+{
+	slideFinal=Collection();
+	if(!unplannedc.isEmpty())
+	{	
+		for each index uc in unplannedc
+        {
+			jamieu=unplannedc.get(uc);
+			if(uc==0)
+			{
+				jamieu.put('title','Unplanned-Build');
+				
+			}
+			else 
+            {
+				jamieu.put('title','');
+            }
+			slideFinal.insert(unplannedc.get(uc));
+        }
+	}
+	if(!firstc.isEmpty())
+	{	
+		for each index fc in firstc
+        {
+			//info firstc.get(uc)+"---------------";
+			jamie=firstc.get(fc);
+			if(fc==0)
+			{
+				jamie.put('title','First-Build');
+				
+			}
+			else 
+            {
+				jamie.put('title','');
+            }
+			slideFinal.insert(firstc.get(fc));
+        }
+	}
+	if(!secondc.isEmpty())
+	{	
+		for each index sc in secondc
+        {
+			jamies=secondc.get(sc);
+			if(sc==0)
+			{
+				jamies.put('title','Second-Build');
+				
+			}
+			else 
+            {
+				jamies.put('title','');
+            }
+			slideFinal.insert(secondc.get(sc));
+        }
+	}
+	if(!thirdc.isEmpty())
+	{	
+		for each index tc in thirdc
+        {
+			//info firstc.get(uc)+"---------------";
+			jamiet=thirdc.get(tc);
+			if(tc==0)
+			{
+				jamiet.put('title','Third-Build');			
+			}
+			else 
+            {
+				jamiet.put('title','');
+            }
+			slideFinal.insert(thirdc.get(tc));
+        }
+	}
+	if(!fourthc.isEmpty())
+	{	
+		for each index ffc in fourthc
+        {
+			//info firstc.get(uc)+"---------------";
+			jamieffc=fourthc.get(ffc);
+			if(ffc==0)
+			{
+				jamieffc.put('title','Fourth-Build');
+				
+			}
+			else 
+            {
+				jamieffc.put('title','');
+            }
+			slideFinal.insert(fourthc.get(ffc));
+        }
+	}
+	if(!fifthc.isEmpty())
+	{	
+		for each index fff in fifthc
+        {
+			jamiefff=fifthc.get(fff);
+			if(fff==0)
+			{
+				jamiefff.put('title','Fifth-Build');				
+			}
+			else 
+            {
+				jamiefff.put('title','');
+            }
+			slideFinal.insert(fifthc.get(fff));
+        }
+	}
+}
+///------------------
+info slideFinal;
+//info cliqMsgJson;
+//xsam=zoho.cliq.postToChat("CT_2243209938789583353_64396901",cliqMsgJson,"jaiconnecttest");
+//info xsam;
