@@ -1,7 +1,7 @@
 sdays = {'sunday','monday','tuesday','wednesday','thursday','friday','saturday'};
 ranked = {'Unplanned','first','second','third','fourth','fifth'};
 sectionIdOnDays = {1,105000216401074,105000216401078,105000216401080,105000216380992,105000282286212,1};
-currentDate = toString(now,"dd-MM-yyyy","Asia/Calcutta").getDayOfWeek()+1;
+currentDate = toString(now,"dd-MM-yyyy","Asia/Calcutta").getDayOfWeek()-1;
 //minus for correct indexing
 response = invokeurl
 [
@@ -170,113 +170,111 @@ if(unplannedc.isEmpty() && firstc.isEmpty())
 }
 else
 {
-	slideFinal=Collection();
+	slideFinal = Collection();
 	if(!unplannedc.isEmpty())
-	{	
+	{
 		for each index uc in unplannedc
-        {
-			jamieu=unplannedc.get(uc);
-			if(uc==0)
+		{
+			jamieu = unplannedc.get(uc);
+			if(uc == 0)
 			{
 				jamieu.put('title','Unplanned-Build');
-				
 			}
-			else 
-            {
+			else
+			{
 				jamieu.put('title','');
-            }
+			}
 			slideFinal.insert(unplannedc.get(uc));
-        }
+		}
 	}
 	if(!firstc.isEmpty())
-	{	
+	{
 		for each index fc in firstc
-        {
+		{
 			//info firstc.get(uc)+"---------------";
-			jamie=firstc.get(fc);
-			if(fc==0)
+			jamie = firstc.get(fc);
+			if(fc == 0)
 			{
 				jamie.put('title','First-Build');
-				
 			}
-			else 
-            {
+			else
+			{
 				jamie.put('title','');
-            }
+			}
 			slideFinal.insert(firstc.get(fc));
-        }
+		}
 	}
 	if(!secondc.isEmpty())
-	{	
+	{
 		for each index sc in secondc
-        {
-			jamies=secondc.get(sc);
-			if(sc==0)
+		{
+			jamies = secondc.get(sc);
+			if(sc == 0)
 			{
 				jamies.put('title','Second-Build');
-				
 			}
-			else 
-            {
+			else
+			{
 				jamies.put('title','');
-            }
+			}
 			slideFinal.insert(secondc.get(sc));
-        }
+		}
 	}
 	if(!thirdc.isEmpty())
-	{	
+	{
 		for each index tc in thirdc
-        {
+		{
 			//info firstc.get(uc)+"---------------";
-			jamiet=thirdc.get(tc);
-			if(tc==0)
+			jamiet = thirdc.get(tc);
+			if(tc == 0)
 			{
-				jamiet.put('title','Third-Build');			
+				jamiet.put('title','Third-Build');
 			}
-			else 
-            {
+			else
+			{
 				jamiet.put('title','');
-            }
+			}
 			slideFinal.insert(thirdc.get(tc));
-        }
+		}
 	}
 	if(!fourthc.isEmpty())
-	{	
+	{
 		for each index ffc in fourthc
-        {
+		{
 			//info firstc.get(uc)+"---------------";
-			jamieffc=fourthc.get(ffc);
-			if(ffc==0)
+			jamieffc = fourthc.get(ffc);
+			if(ffc == 0)
 			{
 				jamieffc.put('title','Fourth-Build');
-				
 			}
-			else 
-            {
+			else
+			{
 				jamieffc.put('title','');
-            }
+			}
 			slideFinal.insert(fourthc.get(ffc));
-        }
+		}
 	}
 	if(!fifthc.isEmpty())
-	{	
+	{
 		for each index fff in fifthc
-        {
-			jamiefff=fifthc.get(fff);
-			if(fff==0)
+		{
+			jamiefff = fifthc.get(fff);
+			if(fff == 0)
 			{
-				jamiefff.put('title','Fifth-Build');				
+				jamiefff.put('title','Fifth-Build');
 			}
-			else 
-            {
+			else
+			{
 				jamiefff.put('title','');
-            }
+			}
 			slideFinal.insert(fifthc.get(fff));
-        }
+		}
 	}
+	//putting slidefinal into cliqmsgjson
+	cliqMsgJson.put('slides',slideFinal);
 }
-///------------------
-info slideFinal;
+///----->><<-------------
 //info cliqMsgJson;
-//xsam=zoho.cliq.postToChat("CT_2243209938789583353_64396901",cliqMsgJson,"jaiconnecttest");
-//info xsam;
+//info cliqMsgJson;
+xsam=zoho.cliq.postToChat("CT_2243209938789583353_64396901",cliqMsgJson,"jaiconnecttest");
+info xsam;
