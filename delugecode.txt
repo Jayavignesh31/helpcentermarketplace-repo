@@ -45,6 +45,7 @@ else
 			{
 				finalizedSubJson.put('ticketUrl',null);
 				finalizedSubJson.put('qaOwner',null);
+				finalizedSubJson.put('qaOwnerZuid',null);
 				finalizedSubJson.put('devOwner',null);
 				finalizedSubJson.put('buildtype',null);				
 			}
@@ -54,15 +55,15 @@ else
 				devo="";
 				if(ticketsearch.get('data').get(0).get('contact').get('firstName')!=null)
 				{
-					qao=ticketsearch.get('data').get(0).get('contact').get('firstName');
+					devo=ticketsearch.get('data').get(0).get('contact').get('firstName');
 				}
 				if(ticketsearch.get('data').get(0).get('assignee').get('firstName')!=null)
 				{
-					devo=ticketsearch.get('data').get(0).get('assignee').get('firstName');
+					qao=ticketsearch.get('data').get(0).get('assignee').get('firstName');
 				}
 				finalizedSubJson.put('ticketUrl',ticketsearch.get('data').get(0).get('webUrl'));
-				finalizedSubJson.put('qaOwner',qao+' '+ticketsearch.get('data').get(0).get('contact').get('lastName'));
-				finalizedSubJson.put('devOwner',devo+' '+ticketsearch.get('data').get(0).get('assignee').get('lastName'));
+				finalizedSubJson.put('qaOwner',qao+' '+ticketsearch.get('data').get(0).get('assignee').get('lastName'));				finalizedSubJson.put('qaOwnerZuid',ticketsearch.get('data').get(0).get('assignee').get('zuid'));
+				finalizedSubJson.put('devOwner',devo+' '+ticketsearch.get('data').get(0).get('contact').get('lastName'));
 				finalizedSubJson.put('buildtype',ticketsearch.get('data').get(0).get('customFields').get('Build Type'));
 				
 			}
@@ -71,7 +72,8 @@ else
 		{
 			finalizedSubJson.put('ticketUrl',null);
 			finalizedSubJson.put('qaOwner',null);
-			finalizedSubJson.put('devOwner',null);
+			finalizedSubJson.put('qaOwnerZuid',null);
+			finalizedSubJson.put('devOwner',null);			
 			finalizedSubJson.put('buildtype',null);		
 		}
 		///
