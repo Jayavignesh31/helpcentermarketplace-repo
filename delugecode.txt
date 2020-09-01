@@ -1,8 +1,9 @@
 sdays = {'sunday','monday','tuesday','wednesday','thursday','friday','saturday'};
 ranked = {'Unplanned','first','second','third','fourth','fifth'};
 sectionIdOnDays = {1,105000216401074,105000216401078,105000216401080,105000216380992,105000282286212,1};
-datex=toString(now,"dd-MM-yyyy","Asia/Calcutta");
-currentDate = datex.getDayOfWeek() - 1;
+datex=toString(now,"dd-MMM-yyyy","Asia/Calcutta");
+currentDate = datex.getDayOfWeek()-1;
+//info currentDate;
 //minus for correct indexing
 response = invokeurl
 [
@@ -43,15 +44,35 @@ else
 			if(ticketsearch.isEmpty())
 			{
 				finalizedSubJson.put('ticketUrl',null);
+				finalizedSubJson.put('qaOwner',null);
+				finalizedSubJson.put('devOwner',null);
+				finalizedSubJson.put('buildtype',null);				
 			}
 			else
 			{
+				qao="";
+				devo="";
+				if(ticketsearch.get('data').get(0).get('contact').get('firstName')!=null)
+				{
+					qao=ticketsearch.get('data').get(0).get('contact').get('firstName');
+				}
+				if(ticketsearch.get('data').get(0).get('assignee').get('firstName')!=null)
+				{
+					devo=ticketsearch.get('data').get(0).get('assignee').get('firstName');
+				}
 				finalizedSubJson.put('ticketUrl',ticketsearch.get('data').get(0).get('webUrl'));
+				finalizedSubJson.put('qaOwner',qao+' '+ticketsearch.get('data').get(0).get('contact').get('lastName'));
+				finalizedSubJson.put('devOwner',devo+' '+ticketsearch.get('data').get(0).get('assignee').get('lastName'));
+				finalizedSubJson.put('buildtype',ticketsearch.get('data').get(0).get('customFields').get('Build Type'));
+				
 			}
 		}
 		else
 		{
 			finalizedSubJson.put('ticketUrl',null);
+			finalizedSubJson.put('qaOwner',null);
+			finalizedSubJson.put('devOwner',null);
+			finalizedSubJson.put('buildtype',null);		
 		}
 		///
 		/////releasenotes key-value putting
@@ -102,7 +123,7 @@ else
 	}
 	finalizedJson.put("data",groupingSubJson);
 }
-//info finalizedJson;
+info finalizedJson;
 ////------------>API Part Done<------------------------
 ///cliq side handling
 cliqMsgJson = {"text":"Hai team Good mrg,Here's the list for today release builds["+datex+"]","bot":{"name":"DESK-QA","image":"https://e7.pngegg.com/pngimages/637/297/png-clipart-rocket-logo-rocket-blue-logo.png"},"card":{"theme":"modern-inline"},"slides":{}};
@@ -276,5 +297,5 @@ else
 }
 ///----->><<-------------
 //info cliqMsgJson;
-xsam = zoho.cliq.postToChat("CT_2243209938789583353_64396901",cliqMsgJson,"jaiconnecttest");
-info xsam;
+//xsam = zoho.cliq.postToChat("CT_2243209938789583353_64396901",cliqMsgJson,"jaiconnecttest");
+//info xsam;
