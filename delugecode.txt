@@ -3,7 +3,7 @@ ranked = {'Unplanned','first','second','third','fourth','fifth'};
 checklistGroupsStatic = {'pre-data','post-data','pre-meta','post-meta','upto-pre','data','meta','staticupdate','emergency','performance_fix'};
 sectionIdOnDays = {1,105000216401074,105000216401078,105000216401080,105000216380992,105000282286212,1};
 datex = toString(now,"dd-MMM-yyyy","Asia/Calcutta");
-currentDate = datex.getDayOfWeek() -1;
+currentDate = datex.getDayOfWeek() - 2;
 //info currentDate;
 //minus for correct indexing
 response = invokeurl
@@ -20,7 +20,7 @@ finalizedJson = Map();
 groupingSubJson = Collection();
 if(response.get('sectionTasks').isEmpty())
 {
-	finalizedJson.put('subject',"Still,we aren't planned any builds.will plann soon");
+	finalizedJson.put('subject',"Still,we aren't planned any builds.will plan soon");
 	finalizedJson.put('releasenotes',null);
 	finalizedJson.put('tags',Collection());
 }
@@ -137,7 +137,8 @@ else
 //info finalizedJson;
 ////------------>API Part Done<------------------------
 ///cliq side handling
-cliqMsgJson = {"text":"Hai team Good mrg,Here's the list for today release builds[" + datex + "]","bot":{"name":"DESK-QA","image":"https://e7.pngegg.com/pngimages/637/297/png-clipart-rocket-logo-rocket-blue-logo.png"},"card":{"theme":"modern-inline"},"slides":{}};
+//Hai Team Good mrg,Here's the list for today release builds[" + datex + "]
+cliqMsgJson = {"text":"Hai Team Good Morning,Here's the list for today release builds[" + datex + "]","bot":{"name":"DESK-QA","image":"https://e7.pngegg.com/pngimages/637/297/png-clipart-rocket-logo-rocket-blue-logo.png"},"card":{"theme":"modern-inline"},"slides":{}};
 ///slides creating section
 cliqloop = finalizedJson.get('data');
 unplannedc = Collection();
@@ -146,33 +147,37 @@ secondc = Collection();
 thirdc = Collection();
 fourthc = Collection();
 fifthc = Collection();
+atMentioners = Collection();
 for each index cliqslideindex in cliqloop
 {
 	slideJson = {"type":"text","title":"","data":"","buttons":{}};
 	buttonJsonR = {"label":"Release notes","type":"+","action":{"type":"open.url","data":{"web":""}}};
-	//buttonJsonT = {"label":"Ticket URL","type":"+","action":{"type":"open.url","data":{"web":""}}};
 	numberForReorder = cliqloop.get(cliqslideindex).get('orderNo');
 	buttonGroup = Collection();
 	//Values in Data key---------||||
-	datasubject=cliqloop.get(cliqslideindex).get('subject');
-	dataurl=cliqloop.get(cliqslideindex).get('ticketUrl');
-	dataqaown=cliqloop.get(cliqslideindex).get('qaOwner');
-	datadevown=cliqloop.get(cliqslideindex).get('devOwner');
-	databuildtype=cliqloop.get(cliqslideindex).get('buildtype');
-	datachecklist=cliqloop.get(cliqslideindex).get('checklist');
-	if(dataurl==null)
+	datasubject = cliqloop.get(cliqslideindex).get('subject');
+	dataurl = cliqloop.get(cliqslideindex).get('ticketUrl');
+	dataqaown = cliqloop.get(cliqslideindex).get('qaOwner');
+	datadevown = cliqloop.get(cliqslideindex).get('devOwner');
+	databuildtype = cliqloop.get(cliqslideindex).get('buildtype');
+	datachecklist = cliqloop.get(cliqslideindex).get('checklist');
+	if(cliqloop.get(cliqslideindex).get('qaOwnerZuid') != null)
 	{
-		dataurl="";
+		atMentioners.insert("{@" + cliqloop.get(cliqslideindex).get('qaOwnerZuid') + "}");
 	}
-	else 
-    {
-		datasubject="["+datasubject+"]("+dataurl+")\n QA-Owner : "+dataqaown+"\n Developer : "+datadevown+"\n Build Type : "+databuildtype;
+	if(dataurl == null)
+	{
+		dataurl = "";
+	}
+	else
+	{
+		datasubject = "[" + datasubject + "](" + dataurl + ")\n QA-Owner : " + dataqaown + "\n Developer : " + datadevown + "\n Build Type : " + databuildtype;
 		if(!datachecklist.isEmpty())
 		{
-			datasubject=datasubject+"\n Checklist:["+datachecklist+"]";
+			datasubject = datasubject + "\n Checklist:[" + datachecklist + "]";
 		}
-    }
-	slideJson.put('data',datasubject);	
+	}
+	slideJson.put('data',datasubject);
 	//------------||||
 	slideJson.put('title',ranked.get(cliqloop.get(cliqslideindex).get('orderNo')) + '-build');
 	if(cliqloop.get(cliqslideindex).get('releasenotes') != null)
@@ -181,12 +186,6 @@ for each index cliqslideindex in cliqloop
 		br.put('web',cliqloop.get(cliqslideindex).get('releasenotes'));
 		buttonGroup.insert(buttonJsonR);
 	}
-// 	if(cliqloop.get(cliqslideindex).get('ticketUrl') != null)
-// 	{
-// 		bt = buttonJsonT.get('action').get('data');
-// 		bt.put('web',cliqloop.get(cliqslideindex).get('ticketUrl'));
-// 		buttonGroup.insert(buttonJsonT);
-// 	}
 	slideJson.put('buttons',buttonGroup);
 	if(numberForReorder == 1)
 	{
@@ -213,13 +212,12 @@ for each index cliqslideindex in cliqloop
 		fifthc.insert(slideJson);
 	}
 }
-//info secondc+"--pose";
 ///-----------------
 ///final cliq json assemble section
 if(unplannedc.isEmpty() && firstc.isEmpty())
 {
 	//info "yes";
-	cliqMsgJson.put("text","Hai team Good mrg,Still we aren't planned any builds yet.will plan soon");
+	cliqMsgJson.put("text","Hai Team Good Morning,Still we aren't planned any builds yet.will plan soon");
 }
 else
 {
@@ -323,6 +321,8 @@ else
 			slideFinal.insert(fifthc.get(fff));
 		}
 	}
+	//@mentions adding 
+	cliqMsgJson.put('text',cliqMsgJson.get('text') + " " + atMentioners.distinct());
 	//putting slidefinal into cliqmsgjson
 	cliqMsgJson.put('slides',slideFinal);
 }
