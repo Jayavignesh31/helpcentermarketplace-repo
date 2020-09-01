@@ -1,9 +1,9 @@
 sdays = {'sunday','monday','tuesday','wednesday','thursday','friday','saturday'};
 ranked = {'Unplanned','first','second','third','fourth','fifth'};
-checklistGroupsStatic=['pre-data','post-data','pre-meta','post-meta','upto-pre','data','meta','staticupdate','emergency','performance_fix'];
+checklistGroupsStatic = {'pre-data','post-data','pre-meta','post-meta','upto-pre','data','meta','staticupdate','emergency','performance_fix'};
 sectionIdOnDays = {1,105000216401074,105000216401078,105000216401080,105000216380992,105000282286212,1};
 datex = toString(now,"dd-MMM-yyyy","Asia/Calcutta");
-currentDate = datex.getDayOfWeek() - 1;
+currentDate = datex.getDayOfWeek() -1;
 //info currentDate;
 //minus for correct indexing
 response = invokeurl
@@ -91,11 +91,11 @@ else
 		if(processJsonUptoTask.get(item).containKey('tags'))
 		{
 			finalizedSubTagColection = Collection();
-			checklistDynamic=Collection();
+			checklistDynamic = Collection();
 			subLoop = processJsonUptoTask.get(item).get('tags');
 			for each index tagindex in subLoop
 			{
-				saml=subLoop.get(tagindex).get('name');
+				saml = subLoop.get(tagindex).get('name');
 				finalizedSubTagColection.insert(saml);
 				if(checklistGroupsStatic.containsValue(saml))
 				{
@@ -108,7 +108,7 @@ else
 		else
 		{
 			finalizedSubJson.put('tags',Collection());
-			finalizedSubJson.put('checklist',collection());
+			finalizedSubJson.put('checklist',Collection());
 		}
 		//ordernumber finding
 		k5 = finalizedSubJson.get('tags');
@@ -134,7 +134,7 @@ else
 	}
 	finalizedJson.put("data",groupingSubJson);
 }
-info finalizedJson;
+//info finalizedJson;
 ////------------>API Part Done<------------------------
 ///cliq side handling
 cliqMsgJson = {"text":"Hai team Good mrg,Here's the list for today release builds[" + datex + "]","bot":{"name":"DESK-QA","image":"https://e7.pngegg.com/pngimages/637/297/png-clipart-rocket-logo-rocket-blue-logo.png"},"card":{"theme":"modern-inline"},"slides":{}};
@@ -150,10 +150,30 @@ for each index cliqslideindex in cliqloop
 {
 	slideJson = {"type":"text","title":"","data":"","buttons":{}};
 	buttonJsonR = {"label":"Release notes","type":"+","action":{"type":"open.url","data":{"web":""}}};
-	buttonJsonT = {"label":"Ticket URL","type":"+","action":{"type":"open.url","data":{"web":""}}};
+	//buttonJsonT = {"label":"Ticket URL","type":"+","action":{"type":"open.url","data":{"web":""}}};
 	numberForReorder = cliqloop.get(cliqslideindex).get('orderNo');
 	buttonGroup = Collection();
-	slideJson.put('data',cliqloop.get(cliqslideindex).get('subject') + '\n[Tags:' + cliqloop.get(cliqslideindex).get('tags') + ']');
+	//Values in Data key---------||||
+	datasubject=cliqloop.get(cliqslideindex).get('subject');
+	dataurl=cliqloop.get(cliqslideindex).get('ticketUrl');
+	dataqaown=cliqloop.get(cliqslideindex).get('qaOwner');
+	datadevown=cliqloop.get(cliqslideindex).get('devOwner');
+	databuildtype=cliqloop.get(cliqslideindex).get('buildtype');
+	datachecklist=cliqloop.get(cliqslideindex).get('checklist');
+	if(dataurl==null)
+	{
+		dataurl="";
+	}
+	else 
+    {
+		datasubject="["+datasubject+"]("+dataurl+")\n QA-Owner : "+dataqaown+"\n Developer : "+datadevown+"\n Build Type : "+databuildtype;
+		if(!datachecklist.isEmpty())
+		{
+			datasubject=datasubject+"\n Checklist:["+datachecklist+"]";
+		}
+    }
+	slideJson.put('data',datasubject);	
+	//------------||||
 	slideJson.put('title',ranked.get(cliqloop.get(cliqslideindex).get('orderNo')) + '-build');
 	if(cliqloop.get(cliqslideindex).get('releasenotes') != null)
 	{
@@ -161,12 +181,12 @@ for each index cliqslideindex in cliqloop
 		br.put('web',cliqloop.get(cliqslideindex).get('releasenotes'));
 		buttonGroup.insert(buttonJsonR);
 	}
-	if(cliqloop.get(cliqslideindex).get('ticketUrl') != null)
-	{
-		bt = buttonJsonT.get('action').get('data');
-		bt.put('web',cliqloop.get(cliqslideindex).get('ticketUrl'));
-		buttonGroup.insert(buttonJsonT);
-	}
+// 	if(cliqloop.get(cliqslideindex).get('ticketUrl') != null)
+// 	{
+// 		bt = buttonJsonT.get('action').get('data');
+// 		bt.put('web',cliqloop.get(cliqslideindex).get('ticketUrl'));
+// 		buttonGroup.insert(buttonJsonT);
+// 	}
 	slideJson.put('buttons',buttonGroup);
 	if(numberForReorder == 1)
 	{
@@ -308,5 +328,5 @@ else
 }
 ///----->><<-------------
 //info cliqMsgJson;
-//xsam = zoho.cliq.postToChat("CT_2243209938789583353_64396901",cliqMsgJson,"jaiconnecttest");
-//info xsam;
+xsam = zoho.cliq.postToChat("CT_2243209938789583353_64396901",cliqMsgJson,"jaiconnecttest");
+info xsam;
