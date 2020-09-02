@@ -1,0 +1,17 @@
+list = List();
+entry = Map();
+entry.put("title","Monday");
+list.add(entry);
+entry1 = Map();
+entry1.put("title","Tuesday");
+list.add(entry1);
+entry2 = Map();
+entry2.put("title","Wednesday");
+list.add(entry2);
+entry3 = Map();
+entry3.put("title","Thursday");
+list.add(entry3);
+entry4 = Map();
+entry4.put("title","Friday");
+list.add(entry4);
+return list;
