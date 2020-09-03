@@ -3,8 +3,7 @@ ranked = {'Unplanned','first','second','third','fourth','fifth'};
 checklistGroupsStatic = {'pre-data','post-data','pre-meta','post-meta','upto-pre','data','meta','staticupdate','emergency','performance_fix'};
 sectionIdOnDays = {1,105000216401074,105000216401078,105000216401080,105000216380992,105000282286212,1};
 datex = toString(now,"dd-MMM-yyyy","Asia/Calcutta");
-currentDate = datex.getDayOfWeek() - 2;
-//info currentDate;
+currentDate = datex.getDayOfWeek() - 1;
 //minus for correct indexing
 response = invokeurl
 [
@@ -216,8 +215,7 @@ for each index cliqslideindex in cliqloop
 ///final cliq json assemble section
 if(unplannedc.isEmpty() && firstc.isEmpty())
 {
-	//info "yes";
-	cliqMsgJson.put("text","Hai Team Good Morning,Still we aren't planned any builds yet.will plan soon");
+	cliqMsgJson.put("text","*Hai Team Good Morning,Still we haven't planned to release any builds yet.will plan soon [" + datex + "]*");
 }
 else
 {
@@ -242,7 +240,6 @@ else
 	{
 		for each index fc in firstc
 		{
-			//info firstc.get(uc)+"---------------";
 			jamie = firstc.get(fc);
 			if(fc == 0)
 			{
@@ -275,7 +272,6 @@ else
 	{
 		for each index tc in thirdc
 		{
-			//info firstc.get(uc)+"---------------";
 			jamiet = thirdc.get(tc);
 			if(tc == 0)
 			{
@@ -292,7 +288,6 @@ else
 	{
 		for each index ffc in fourthc
 		{
-			//info firstc.get(uc)+"---------------";
 			jamieffc = fourthc.get(ffc);
 			if(ffc == 0)
 			{
