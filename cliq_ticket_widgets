@@ -1,4 +1,4 @@
-givenStatus={"Open","On Hold","Local Testing completed","Developer Unavailability","In progress in local","Verification InProgress","Latest merge Request","In progress in Presetup","AutomationServer unavailability","Migration In Progress","Waiting for Migration","Automation completed","Automation is in progress","Waiting for automation","Bugs Fixed","Closed","Appserver unavailability","Local Update","Round Completed","Latest merge requested"};
+givenStatus={"Open","On Hold","Local Testing completed","Developer Unavailability","In progress in local","Verification InProgress","Latest merge Request","In progress in Presetup","AutomationServer unavailability","Migration In Progress","Waiting for Migration","Automation completed","Automation is in progress","Waiting for automation","Bugs Fixed","Appserver unavailability","Local Update","Round Completed","Latest merge requested"};
 neglectingStatus = {"Merged with another build","Updated in Live","Live in BETA","Marketplace IDC","Patched in LIVE","PreQA done","Updated in Supportlab","Live static update","Submitted to ZApps","Merged with another build","Tag pending"};
 staticModuleRelations = {{"accountOwner":"R.Karthick","moduleName":"Integration","accountOwnerZuid":"733621","groupIds":{119027000028682253}},{"accountOwner":"Emil chacko","moduleName":"Marketplace","accountOwnerZuid":"6232620","groupIds":{119027000028682233,119027000046916380}}};
 //default id setting
@@ -37,12 +37,20 @@ if(id=="allmodule")
         [
         	url: "https://desk.zoho.com/api/v1/accounts/"+accountId+"/tickets"
         	type: GET
+			parameters:{"limit":99,"departmentId":119027000000126064}
 			connection : "cliqjaioauth"
-        	
         ];
-		ticketCollect=Collection();
-		ticketCollect=getTicket;
-        }	
+	ticketCollect=getTicket.get("data");
+	ticketGroup=Collection();
+	//ticket grouping
+	for each statuscheck in ticketCollect
+	{
+	if(givenStatus.containsValue(statuscheck.get('status')))
+	{
+		ticketGroup.insert(statuscheck);
+	}
+	}
+    }	
     }
 }else if(target.get("id")=="mymodule")
 	{
