@@ -1,21 +1,23 @@
-neglectingStatus=["Merged with another build","Updated in Live","Live in BETA","Marketplace IDC","Patched in LIVE","PreQA done","Updated in Supportlab","Live static update","Submitted to ZApps","Merged with another build","Tag pending"];
-staticModuleRelations=[
-  {
-    "accountOwner": "R.Karthick",
-    "moduleName": "Integration",
-    "accountOwnerZuid": "733621",
-    "groupIds": [
-      119027000028682260
-    ]
-  },
-  {
-    "accountOwner": "Emil chacko",
-    "moduleName": "Marketplace",
-    "accountOwnerZuid": "6232620",
-    "groupIds": [
-      119027000006383090,
-      119027000046916380
-    ]
-  }
-];
+
+neglectingStatus = {"Merged with another build","Updated in Live","Live in BETA","Marketplace IDC","Patched in LIVE","PreQA done","Updated in Supportlab","Live static update","Submitted to ZApps","Merged with another build","Tag pending"};
+staticModuleRelations = {{"accountOwner":"R.Karthick","moduleName":"Integration","accountOwnerZuid":"733621","groupIds":{119027000028682260}},{"accountOwner":"Emil chacko","moduleName":"Marketplace","accountOwnerZuid":"6232620","groupIds":{119027000006383090,119027000046916380}}};
+//default id setting
+id = "allmodule";
+if(target.containKey("id"))
+{
+	id = target.get("id");
+}
+if(id=="allmodule")
+{
+	elements = list();
+	elements.add({"type":"title","text":"Here's the list of modules wise ticket's "});
+	sections = list();
+	sections.add({"id":"1","elements":elements});
+}else if(target.get("id")=="mymodule")
+	{
+		elements = list();
+	elements.add({"type":"title","text":"Here's the list of my module ticket's stats "});
+	sections = list();
+	sections.add({"id":"1","elements":elements});
+	}
 return {"type":"applet","tabs":{{"label":"All Modules ticket stats","id":"allmodule"},{"label":"My Module stats","id":"mymodule"}},"active_tab":"allmodule","sections":sections};
