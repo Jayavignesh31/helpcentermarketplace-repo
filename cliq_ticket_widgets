@@ -1,5 +1,5 @@
 givenStatus={"Open","On Hold","Local Testing completed","Developer Unavailability","In progress in local","Verification InProgress","Latest merge Request","In progress in Presetup","AutomationServer unavailability","Migration In Progress","Waiting for Migration","Automation completed","Automation is in progress","Waiting for automation","Bugs Fixed","Appserver unavailability","Local Update","Round Completed","Latest merge requested"};
-neglectingStatus = {"Merged with another build","Updated in Live","Live in BETA","Marketplace IDC","Patched in LIVE","PreQA done","Updated in Supportlab","Live static update","Submitted to ZApps","Merged with another build","Tag pending"};
+//neglectingStatus = {"Merged with another build","Updated in Live","Live in BETA","Marketplace IDC","Patched in LIVE","PreQA done","Updated in Supportlab","Live static update","Submitted to ZApps","Merged with another build","Tag pending"};
 staticModuleRelations = {{"accountOwner":"R.Karthick","moduleName":"Integration","accountOwnerZuid":"733621","groupIds":{119027000028682253}},{"accountOwner":"Emil chacko","moduleName":"Marketplace","accountOwnerZuid":"6232620","groupIds":{119027000028682233,119027000046916380}}};
 //default id setting
 id = "allmodule";
@@ -14,45 +14,67 @@ if(id=="allmodule")
 	sections = list();
 	sections.add({"id":"1","elements":elements});
 	//JSON Construction
-	ticketGroup=Collection();
-	for each jsongen in staticModuleRelations
-    {
-		secondLoop=jsongen.get("groupIds");
-		jsonFormat={
-			"name":null,
-			"tickets":[],
-			"count":0
-		};
-		//secondary for loop
-		for each accountId in secondLoop
-        {
-		jsonSubFormat={
-			"id":0,
-			"url":"",
-			"subject":"",
-			"developer":"",
-			"qaOwner":""
-		};
-		getTicket = invokeurl
-        [
-        	url: "https://desk.zoho.com/api/v1/accounts/"+accountId+"/tickets"
-        	type: GET
-			parameters:{"limit":99,"departmentId":119027000000126064}
-			connection : "cliqjaioauth"
-        ];
-	ticketCollect=getTicket.get("data");
-	ticketGroup=Collection();
+	tableGroup = Collection();
+for each  jsongen in staticModuleRelations
+{
+	jsonFormat = {"name":null,"tickets":{},"count":0};
+	secondLoop = jsongen.get("groupIds");
 	//ticket grouping
-	for each statuscheck in ticketCollect
+	jsonFormat.put("name",jsongen.get("moduleName"));
+	//secondary for loop
+	ticketGroup = Collection();
+	for each  accountId in secondLoop
 	{
-	if(givenStatus.containsValue(statuscheck.get('status')))
-	{
-		ticketGroup.insert(statuscheck);
+		getTicket = invokeurl
+		[
+			url :"https://desk.zoho.com/api/v1/accounts/" + accountId + "/tickets"
+			type :GET
+			parameters:{"limit":99,"departmentId":119027000000126064,"include":"contacts,assignee"}
+			connection:"cliqjaioauth"
+		];
+		ticketCollect = getTicket.get("data");
+		//third for loop
+		i = 0;
+		
+		for each  statuscheck in ticketCollect
+		{
+			jsonSubFormat=Map();
+			if(givenStatus.containsValue(statuscheck.get('status')))
+			{
+				jsonSubFormat.put("id",statuscheck.get('ticketNumber'));
+				jsonSubFormat.put("url",statuscheck.get('webUrl'));
+				jsonSubFormat.put("subject",statuscheck.get('subject'));
+				if(statuscheck.get('assignee').get('firstName') != null)
+				{
+					jsonSubFormat.put("qaOwner",statuscheck.get('assignee').get('firstName') + " " + statuscheck.get('assignee').get('lastName'));
+				}
+				else
+				{
+					jsonSubFormat.put("qaOwner",statuscheck.get('assignee').get('lastName'));
+				}
+				if(statuscheck.get('contact').get('firstName') != null)
+				{
+					jsonSubFormat.put("developer",statuscheck.get('contact').get('firstName') + " " + statuscheck.get('contact').get('lastName'));
+				}
+				else
+				{
+					jsonSubFormat.put("developer",statuscheck.get('contact').get('lastName'));
+				}
+				jsonSubFormat.put("status",statuscheck.get('status'));
+				ticketGroup.insert(jsonSubFormat);
+				i = i + 1;
+				jsonFormat.put("count",i);
+			}
+		}
+		i = 0;
 	}
-	}
-    }	
-    }
-}else if(target.get("id")=="mymodule")
+	jsonFormat.put("tickets",ticketGroup);
+	tableGroup.insert(jsonFormat);
+}
+info tableGroup;
+	//------------------/
+}
+else if(target.get("id")=="mymodule")
 	{
 		elements = list();
 	elements.add({"type":"title","text":"Here's the list of my module ticket's stats "});
