@@ -1,0 +1,170 @@
+staticHeader={
+            "Ticket Number",
+            "Subject",
+            "Developer",
+			"QA Owner",
+			"Status"
+        };
+staticStyle={
+                "width":{
+                    "10",
+                    "40",
+                    "15",
+					"15",
+					"20"
+                },
+                "align":{
+                    "center",
+                    "center",
+					 "center",
+                    "center",
+                    "center"
+                }
+        };
+//dynamic rows
+sss=[
+            {
+                "Ticket Number":"1234567",
+                "Subject":"Add some text here",
+                "Developer":"Abcdef ghijklmn",
+				"QAOwner":"jayavignesh.A",
+				"Status":"Local Testing completed"
+            },
+            {
+                "Ticket Number":"1234567",
+                "Subject":"Add some text here",
+                "Developer":"Abcdef ghijklmn",
+				"QAOwner":"jayavignesh.A",
+				"Status":"Local Testing completed"
+            }
+        ];
+//1////////////////////////////////////////////////////////////////////////////
+sampleJson=[{
+    "name": "API",
+    "tickets": [
+      {
+        "id": "404229",
+        "url": "https://desk.zoho.com/support/zohodeskteam/ShowHomePage.do#Cases/dv/119027000104809001",
+        "subject": "Extension fields bug fixes",
+        "qaOwner": " Jayavignesh",
+        "developer": "Akshay Venkatesh",
+        "status": "Open"
+      },
+      {
+        "id": "394446",
+        "url": "https://desk.zoho.com/support/zohodeskteam/ShowHomePage.do#Cases/dv/119027000100728157",
+        "subject": "Request to test Composite API build",
+        "qaOwner": "R Chellapandi",
+        "developer": "Palpandi",
+        "status": "Open"
+      },
+      {
+        "id": "388604",
+        "url": "https://desk.zoho.com/support/zohodeskteam/ShowHomePage.do#Cases/dv/119027000098665107",
+        "subject": "Extension ResoureIds - Dual Write build",
+        "qaOwner": " Jayavignesh",
+        "developer": "Akshay Venkatesh",
+        "status": "Local Testing completed"
+      },
+      {
+        "id": "386052",
+        "url": "https://desk.zoho.com/support/zohodeskteam/ShowHomePage.do#Cases/dv/119027000097681462",
+        "subject": "Error Handling changes in marketplace ",
+        "qaOwner": " Jayavignesh",
+        "developer": "Akshay Venkatesh",
+        "status": "Local Testing completed"
+      },
+      {
+        "id": "372303",
+        "url": "https://desk.zoho.com/support/zohodeskteam/ShowHomePage.do#Cases/dv/119027000092991356",
+        "subject": "Old API Code Removal",
+        "qaOwner": " Sahana",
+        "developer": "lakshmanan.sp",
+        "status": "On Hold"
+      }
+    ],
+    "count": 5
+  },
+  {
+    "name": "Automation",
+    "tickets": [
+      {
+        "id": "402730",
+        "url": "https://desk.zoho.com/support/zohodeskteam/ShowHomePage.do#Cases/dv/119027000104111287",
+        "subject": "Skill Based Assignment Feature Build",
+        "qaOwner": " Meikanda Moorthi",
+        "developer": "Fredrick Francis A A",
+        "status": "Verification InProgress"
+      },
+      {
+        "id": "401583",
+        "url": "https://desk.zoho.com/support/zohodeskteam/ShowHomePage.do#Cases/dv/119027000103697161",
+        "subject": "Revoke Blueprint Fix ",
+        "qaOwner": " Jayavignesh",
+        "developer": "Sandeep Ghemire",
+        "status": "Open"
+      },
+      {
+        "id": "401045",
+        "url": "https://desk.zoho.com/support/zohodeskteam/ShowHomePage.do#Cases/dv/119027000103472001",
+        "subject": "New Editor changed in Email Templates",
+        "qaOwner": " Sahana",
+        "developer": "Saravana Karthikeyan",
+        "status": "Local Testing completed"
+      }
+    ],
+    "count": 3
+  }];
+//2////////////////////////
+ sections = list();
+ for each responseLoop in sampleJson
+ {
+	 i=0;
+	 elements = list();
+	 if(responseLoop.get('count')>0)
+	{
+	elements.add({"type":"title","text":responseLoop.get('name')});
+	ticketGroupingLoop=responseLoop.get('tickets');
+	rowcollect=Collection();
+	record=Map();
+	//row gen--
+	for each tgl in ticketGroupingLoop
+    {
+		record.put("Ticket Number",tgl.get('id'));
+		record.put("Subject",tgl.get('subject'));
+		record.put("Developer",tgl.get('developer'));
+		record.put("QA Owner",tgl.get('qaOwner'));
+		record.put("Status",tgl.get('status'));
+		rowcollect.insert(record);
+    }
+	//---/
+	elements.add(
+	{
+         "type":"table",
+         "headers":staticHeader,
+         "rows":rowcollect,
+         "style":staticStyle
+     }
+	);
+	sections.add(
+    {
+        "id":i,
+        "elements":elements
+    }
+);
+	i=i+1;
+	}
+ }
+//////////////////////////////////////////////////////////////////////////////
+
+return {
+    "type":"applet",
+    "tabs":[
+        {
+            "label":"Home",
+            "id":"homeTab"
+        }
+    ],
+    "active_tab":"homeTab",
+    "sections":sections
+};
