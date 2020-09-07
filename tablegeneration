@@ -21,25 +21,9 @@ staticStyle={
                     "center"
                 }
         };
-//dynamic rows
-sss=[
-            {
-                "Ticket Number":"1234567",
-                "Subject":"Add some text here",
-                "Developer":"Abcdef ghijklmn",
-				"QAOwner":"jayavignesh.A",
-				"Status":"Local Testing completed"
-            },
-            {
-                "Ticket Number":"1234567",
-                "Subject":"Add some text here",
-                "Developer":"Abcdef ghijklmn",
-				"QAOwner":"jayavignesh.A",
-				"Status":"Local Testing completed"
-            }
-        ];
 //1////////////////////////////////////////////////////////////////////////////
-sampleJson=[{
+sampleJson=[
+{
     "name": "API",
     "tickets": [
       {
@@ -117,19 +101,19 @@ sampleJson=[{
   }];
 //2////////////////////////
  sections = list();
+ i=1;
  for each responseLoop in sampleJson
  {
-	 i=0;
 	 elements = list();
 	 if(responseLoop.get('count')>0)
 	{
 	elements.add({"type":"title","text":responseLoop.get('name')});
 	ticketGroupingLoop=responseLoop.get('tickets');
 	rowcollect=Collection();
-	record=Map();
 	//row gen--
 	for each tgl in ticketGroupingLoop
     {
+		record=Map();
 		record.put("Ticket Number",tgl.get('id'));
 		record.put("Subject",tgl.get('subject'));
 		record.put("Developer",tgl.get('developer'));
@@ -137,6 +121,7 @@ sampleJson=[{
 		record.put("Status",tgl.get('status'));
 		rowcollect.insert(record);
     }
+	//info rowcollect;
 	//---/
 	elements.add(
 	{
@@ -146,6 +131,7 @@ sampleJson=[{
          "style":staticStyle
      }
 	);
+	//info i+"----"+elements;
 	sections.add(
     {
         "id":i,
@@ -155,16 +141,6 @@ sampleJson=[{
 	i=i+1;
 	}
  }
+ info sections;
 //////////////////////////////////////////////////////////////////////////////
 
-return {
-    "type":"applet",
-    "tabs":[
-        {
-            "label":"Home",
-            "id":"homeTab"
-        }
-    ],
-    "active_tab":"homeTab",
-    "sections":sections
-};
