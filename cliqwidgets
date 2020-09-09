@@ -1,0 +1,180 @@
+
+//API Creation section--
+givenStatus = {"Open","On Hold","Local Testing completed","Developer Unavailability","In progress in local","Verification InProgress","Latest merge Request","In progress in Presetup","AutomationServer unavailability","Migration In Progress","Waiting for Migration","Automation completed","Automation is in progress","Waiting for automation","Bugs Fixed","Appserver unavailability","Local Update","Round Completed","Latest merge requested"};
+staticModuleRelations = {{"accountOwner":"R.Karthick","moduleName":"Integration","accountOwnerZuid":{733621,651908175},"groupIds":{119027000028682253}},{"accountOwner":"Emil chacko","moduleName":"Marketplace","accountOwnerZuid":{6232620,651908175},"groupIds":{119027000046916389}},{"accountOwner":"Emil chacko","moduleName":"API","accountOwnerZuid":{6232620,651908175},"groupIds":{119027000028682233}},{"accountOwner":"Ebbu Abraham","moduleName":"Automation","accountOwnerZuid":{5834385,651908175},"groupIds":{119027000007604026}},{"accountOwner":"Ebbu Abraham","moduleName":"Security","accountOwnerZuid":{5834385,651908175},"groupIds":{119027000008233001}},{"accountOwner":"Senthamil Bharathi","moduleName":"I18N and SAS Team ","accountOwnerZuid":{288463},"groupIds":{119027000046916489}},{"accountOwner":"Vijay Anand","moduleName":"Internal Migration","accountOwnerZuid":{1995187},"groupIds":{119027000028682311}},{"accountOwner":"Manojkumar.S","moduleName":"Layout & Fields","accountOwnerZuid":{24467262},"groupIds":{119027000027819013}},{"accountOwner":"Manimekalai","moduleName":"Mail Team","accountOwnerZuid":{2295305},"groupIds":{119027000037548666}},{"accountOwner":"Kumaresan.S","moduleName":"Client","accountOwnerZuid":{1251348},"groupIds":{119027000046916517,119027000022669308}},{"accountOwner":"Vijay Anand","moduleName":"Custom views and Realtime","accountOwnerZuid":{1995187},"groupIds":{119027000028682205}},{"accountOwner":"Vignesh.S","moduleName":"Reports and Dashboard","accountOwnerZuid":{631136517},"groupIds":{119027000006383137}},{"accountOwner":"Dineshkumar","moduleName":"Telephony & Activity","accountOwnerZuid":{2398631},"groupIds":{119027000028682331}},{"accountOwner":"stephen kirubaharan_Yuvi_Srini","moduleName":"Tickets,Customers & Product","accountOwnerZuid":{28818067},"groupIds":{119027000028682273}},{"accountOwner":"vimalesan_Elavarasan","moduleName":"UI/UX Team","accountOwnerZuid":{8237519,45496198},"groupIds":{119027000046916599}},{"accountOwner":"Ashutosh","moduleName":"Signup,Users","accountOwnerZuid":{24465552},"groupIds":{119027000018239001}},{"accountOwner":"Raisudeen","moduleName":"Zia & GC","accountOwnerZuid":{4276511},"groupIds":{119027000046916441}},{"accountOwner":"Suresh.VM","moduleName":"User Migration","accountOwnerZuid":{35092491},"groupIds":{119027000046916461}},{"accountOwner":"Sathya","moduleName":"Social and Chat","accountOwnerZuid":{},"groupIds":{119027000034892045}},{"accountOwner":"Kannapiran","moduleName":"Helpcenter","accountOwnerZuid":{},"groupIds":{119027000006383085}}};
+//mm=Collection();
+a = 0;
+b = 0;
+tableGroup = Collection();
+for each  jsongen in staticModuleRelations
+{
+	jsonFormat = {"name":null,"tickets":{},"accountOwnerZuid":{},"count":0};
+	//ticket grouping
+	jsonFormat.put("name",jsongen.get("moduleName"));
+	jsonFormat.put("accountOwnerZuid",jsongen.get("accountOwnerZuid"));
+	//secondary for loop
+	ticketGroup = Collection();
+	secondLoop = jsongen.get('groupIds');
+	if(!secondLoop.isEmpty())
+	{
+		for each  accountId in secondLoop
+		{
+			getTicket = invokeurl
+			[
+				url :"https://desk.zoho.com/api/v1/accounts/" + accountId + "/tickets"
+				type :GET
+				parameters:{"limit":99,"departmentId":119027000000126064,"include":"contacts,assignee","sortBy":"-createdTime"}
+				connection:"cliqjaioauth"
+			];
+			if(!getTicket.isEmpty())
+			{
+				ticketCollect = getTicket.get("data");
+				//third loop
+				i = 0;
+				for each  statuscheck in ticketCollect
+				{
+					jsonSubFormat = Map();
+					if(givenStatus.containsValue(statuscheck.get('status')))
+					{
+						jsonSubFormat.put("id",statuscheck.get('ticketNumber'));
+						jsonSubFormat.put("url",statuscheck.get('webUrl'));
+						jsonSubFormat.put("subject",statuscheck.get('subject'));
+						if(statuscheck.get('assignee') != null)
+						{
+							if(statuscheck.get('assignee').get('firstName') != null)
+							{
+								jsonSubFormat.put("qaOwner",statuscheck.get('assignee').get('firstName') + " " + statuscheck.get('assignee').get('lastName'));
+							}
+							else
+							{
+								jsonSubFormat.put("qaOwner",statuscheck.get('assignee').get('lastName'));
+							}
+						}
+						else
+						{
+							jsonSubFormat.put("qaOwner","Un-Assigned");
+						}
+						if(statuscheck.get('contact').get('firstName') != null)
+						{
+							jsonSubFormat.put("developer",statuscheck.get('contact').get('firstName') + " " + statuscheck.get('contact').get('lastName'));
+						}
+						else
+						{
+							jsonSubFormat.put("developer",statuscheck.get('contact').get('lastName'));
+						}
+						jsonSubFormat.put("status",statuscheck.get('status'));
+						ticketGroup.insert(jsonSubFormat);
+						i = i + 1;
+						jsonFormat.put("count",i);
+					}
+				}
+				i = 0;
+			}
+		}
+		jsonFormat.put("tickets",ticketGroup);
+		tableGroup.insert(jsonFormat);
+	}
+}
+//-----/
+//widget code  section
+id = "allmodule";
+if(target.containKey("id"))
+{
+	id = target.get("id");
+}
+if(id == "allmodule")
+{
+	//All tab code section --++
+	staticHeader = {"Ticket Number","Subject","Developer","QA Owner","Status"};
+	staticStyle = {"width":{"10","40","15","15","20"},"align":{"center","center","center","center","center"}};
+	sections = list();
+	heading = list();
+	heading.add({"type":"title","text":"Here's the list of module wise tickets"});
+	sections.add({"id":0,"elements":heading});
+	i = 1;
+	for each  responseLoop in tableGroup
+	{
+		elements = list();
+		if(responseLoop.get('count') > 0)
+		{
+			elements.add({"type":"title","text":responseLoop.get('name')});
+			ticketGroupingLoop = responseLoop.get('tickets');
+			rowcollect = Collection();
+			//row gen--
+			for each  tgl in ticketGroupingLoop
+			{
+				record = Map();
+				record.put("Ticket Number",tgl.get('id'));
+				record.put("Subject",tgl.get('subject'));
+				record.put("Developer",tgl.get('developer'));
+				record.put("QA Owner",tgl.get('qaOwner'));
+				record.put("Status",tgl.get('status'));
+				rowcollect.insert(record);
+			}
+			//info rowcollect;
+			//---/
+			elements.add({"type":"table","headers":staticHeader,"rows":rowcollect,"style":staticStyle});
+			//info i+"----"+elements;
+			sections.add({"id":i,"elements":elements});
+			i = i + 1;
+		}
+	}
+	// ---++
+}
+else if(target.get("id") == "mymodule")
+{
+	//for getting zuid--//
+	jaguar = invokeurl
+	[
+		url :"https://desk.zoho.com/api/v1/myinfo"
+		type :GET
+		connection:"personallevel"
+	];
+	//--//
+	//////////
+	currentUserZuid = (jaguar.get('zuid')).toNumber();
+	staticHeader = {"Ticket Number","Subject","Developer","QA Owner","Status"};
+	staticStyle = {"width":{"10","40","15","15","20"},"align":{"center","center","center","center","center"}};
+	sections = list();
+	heading = list();
+	heading.add({"type":"title","text":"Ongoing Testing Builds:"});
+	sections.add({"id":0,"elements":heading});
+	elements = list();
+	rowcollect = Collection();
+	i = 0;
+	privilege=0;
+	checker=Collection();
+	for each  mymodist in tableGroup
+	{
+		checker = mymodist.get('accountOwnerZuid');
+		//elements.add({"type":"text","text":checker+"=="+checker.contains(currentUserZuid)});
+		if(checker.containsvalue(currentUserZuid))
+		{
+			privilege=1;
+			//elements.add({"type":"text","text":"true"});
+			ticketGroupingLoop = mymodist.get('tickets');
+			//row gen--
+			for each  tgl in ticketGroupingLoop
+			{
+				record = Map();
+				record.put("Ticket Number",tgl.get('id'));
+				record.put("Subject",tgl.get('subject'));
+				record.put("Developer",tgl.get('developer'));
+				record.put("QA Owner",tgl.get('qaOwner'));
+				record.put("Status",tgl.get('status'));
+				rowcollect.insert(record);
+			}
+		}
+		
+	}
+// 	if(privilege==0)
+// 	{
+// 		elements.add({"type":"title","text":"You don't have privilege to access this view.If you wan't permission,please contact QA Team"});
+// 	}
+	elements.add({"type":"table","headers":staticHeader,"rows":rowcollect,"style":staticStyle});
+	sections.add({"id":1,"elements":elements});
+	
+	//elements.add({"type":"text","text":"ppp"});
+	//////////
+}
+return {"type":"applet","tabs":{{"label":"All Modules ticket stats","id":"allmodule"},{"label":"My Module stats","id":"mymodule"}},"active_tab":"allmodule","sections":sections};
